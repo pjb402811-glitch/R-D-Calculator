@@ -1,0 +1,5 @@
+{
+  "name": "레버리지&분할계산기",
+  "description": "코인 레버리지투자시 리스크에 따른 레버리지 결정 및  분할매수 계산",
+  "requestFramePermissions": []
+}
