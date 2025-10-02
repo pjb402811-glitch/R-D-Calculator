@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coin-calculator-cache-v5';
+const CACHE_NAME = 'coin-calculator-cache-v6';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,6 +6,7 @@ const urlsToCache = [
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/output.css',
+  '/bundle.js',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'
 ];
 
