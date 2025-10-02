@@ -1,31 +1,14 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { Position, CalculationResult } from '../types';
 import Icon from './Icon';
 import InputGroup from './InputGroup';
 import ResultItem from './ResultItem';
-
-const parseFormattedNumber = (value: string): number => {
-    return parseFloat(value.replace(/,/g, '')) || 0;
-};
-
-const formatNumberString = (value: string): string => {
-    const num = value.replace(/,/g, '');
-    if (num.trim() === '' || isNaN(parseFloat(num))) return value;
-    
-    const parts = num.split('.');
-    const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-    if (parts.length > 1) {
-        const fractionalPart = parts[1].substring(0, 2);
-        return `${integerPart}.${fractionalPart}`;
-    }
-    
-    return integerPart;
-};
+import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { parseFormattedNumber, formatNumberString } from '../utils/formatters';
 
 const FixedLeverageCalculator: React.FC = () => {
-    const [totalCapital, setTotalCapital] = useState(localStorage.getItem('totalCapital') || '10,000,000');
-    const [entryCapital, setEntryCapital] = useState(localStorage.getItem('entryCapital') || '1,000,000');
+    const [totalCapital, setTotalCapital] = useLocalStorageState('totalCapital', '10,000,000');
+    const [entryCapital, setEntryCapital] = useLocalStorageState('entryCapital', '1,000,000');
     const [riskPercent, setRiskPercent] = useState('1');
     const [entryPrice, setEntryPrice] = useState('');
     const [leverage, setLeverage] = useState('50');
@@ -36,14 +19,6 @@ const FixedLeverageCalculator: React.FC = () => {
     const [results, setResults] = useState<CalculationResult | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [warning, setWarning] = useState<string | null>(null);
-
-    useEffect(() => {
-        localStorage.setItem('totalCapital', totalCapital);
-    }, [totalCapital]);
-
-    useEffect(() => {
-        localStorage.setItem('entryCapital', entryCapital);
-    }, [entryCapital]);
 
     const handleCalculate = useCallback(() => {
         setError(null);

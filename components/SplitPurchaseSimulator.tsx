@@ -1,64 +1,25 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import Icon from './Icon';
 import InputGroup from './InputGroup';
 import ResultItem from './ResultItem';
 import type { SplitPurchaseResultRow, SplitPurchaseSummary } from '../types';
-
-const parseFormattedNumber = (value: string): number => {
-    return parseFloat(value.replace(/,/g, '')) || 0;
-};
-
-const formatNumberString = (value: string): string => {
-    if (value.trim() === '') return '';
-    const num = value.replace(/,/g, '');
-    if (isNaN(parseFloat(num))) return value;
-    
-    const parts = num.split('.');
-    const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-    return parts.length > 1 ? `${integerPart}.${parts[1]}` : integerPart;
-};
+import { useLocalStorageState } from '../hooks/useLocalStorageState';
+import { parseFormattedNumber, formatNumberString } from '../utils/formatters';
 
 
 const SplitPurchaseSimulator: React.FC = () => {
-    const [itemName, setItemName] = useState(() => localStorage.getItem('split_itemName') || '');
-    const [currentPrice, setCurrentPrice] = useState(() => localStorage.getItem('split_currentPrice') || '0');
-    const [totalCapital, setTotalCapital] = useState(() => localStorage.getItem('split_totalCapital') || '0');
-    const [splitCount, setSplitCount] = useState(() => localStorage.getItem('split_splitCount') || '0');
-    const [dropRate, setDropRate] = useState(() => localStorage.getItem('split_dropRate') || '0');
-    const [martingaleMultiplier, setMartingaleMultiplier] = useState(() => localStorage.getItem('split_martingaleMultiplier') || '0');
+    const [itemName, setItemName] = useLocalStorageState('split_itemName', '');
+    const [currentPrice, setCurrentPrice] = useLocalStorageState('split_currentPrice', '0');
+    const [totalCapital, setTotalCapital] = useLocalStorageState('split_totalCapital', '0');
+    const [splitCount, setSplitCount] = useLocalStorageState('split_splitCount', '0');
+    const [dropRate, setDropRate] = useLocalStorageState('split_dropRate', '0');
+    const [martingaleMultiplier, setMartingaleMultiplier] = useLocalStorageState('split_martingaleMultiplier', '0');
 
-    const [activeTab, setActiveTab] = useState<'equal' | 'martingale'>(() => {
-        const savedTab = localStorage.getItem('split_activeTab');
-        return (savedTab === 'equal' || savedTab === 'martingale') ? savedTab : 'equal';
-    });
+    const [activeTab, setActiveTab] = useLocalStorageState<'equal' | 'martingale'>('split_activeTab', 'equal');
     
-    const [results, setResults] = useState<{ equal: { rows: SplitPurchaseResultRow[], summary: SplitPurchaseSummary }, martingale: { rows: SplitPurchaseResultRow[], summary: SplitPurchaseSummary }} | null>(() => {
-        const savedResults = localStorage.getItem('split_results');
-        try {
-            return savedResults ? JSON.parse(savedResults) : null;
-        } catch (e) {
-            console.error("Failed to parse split results from localStorage", e);
-            return null;
-        }
-    });
+    const [results, setResults] = useLocalStorageState<{ equal: { rows: SplitPurchaseResultRow[], summary: SplitPurchaseSummary }, martingale: { rows: SplitPurchaseResultRow[], summary: SplitPurchaseSummary }} | null>('split_results', null);
 
-    const [executedRows, setExecutedRows] = useState<Record<number, boolean>>(() => {
-        const savedRows = localStorage.getItem('split_executedRows');
-        try {
-            return savedRows ? JSON.parse(savedRows) : {};
-        } catch (e) {
-            console.error("Failed to parse executed rows from localStorage", e);
-            return {};
-        }
-    });
-
-    useEffect(() => { localStorage.setItem('split_itemName', itemName); }, [itemName]);
-    useEffect(() => { localStorage.setItem('split_currentPrice', currentPrice); }, [currentPrice]);
-    useEffect(() => { localStorage.setItem('split_totalCapital', totalCapital); }, [totalCapital]);
-    useEffect(() => { localStorage.setItem('split_splitCount', splitCount); }, [splitCount]);
-    useEffect(() => { localStorage.setItem('split_dropRate', dropRate); }, [dropRate]);
-    useEffect(() => { localStorage.setItem('split_martingaleMultiplier', martingaleMultiplier); }, [martingaleMultiplier]);
+    const [executedRows, setExecutedRows] = useLocalStorageState<Record<number, boolean>>('split_executedRows', {});
 
 
     const handleCalculate = useCallback(() => {
@@ -121,8 +82,7 @@ const SplitPurchaseSimulator: React.FC = () => {
         
         setResults({ equal: { rows: equalRows, summary: equalSummary }, martingale: { rows: martingaleRows, summary: martingaleSummary }});
         setExecutedRows({});
-        localStorage.removeItem('split_executedRows');
-    }, [currentPrice, totalCapital, splitCount, dropRate, martingaleMultiplier]);
+    }, [currentPrice, totalCapital, splitCount, dropRate, martingaleMultiplier, setResults, setExecutedRows]);
 
     const handleReset = () => {
         setItemName('');
@@ -133,6 +93,14 @@ const SplitPurchaseSimulator: React.FC = () => {
         setMartingaleMultiplier('0');
         setResults(null);
         setExecutedRows({});
+        setActiveTab('equal');
+        // Manually clear all related localStorage items
+        localStorage.removeItem('split_itemName');
+        localStorage.removeItem('split_currentPrice');
+        localStorage.removeItem('split_totalCapital');
+        localStorage.removeItem('split_splitCount');
+        localStorage.removeItem('split_dropRate');
+        localStorage.removeItem('split_martingaleMultiplier');
         localStorage.removeItem('split_results');
         localStorage.removeItem('split_executedRows');
         localStorage.removeItem('split_activeTab');
@@ -140,9 +108,7 @@ const SplitPurchaseSimulator: React.FC = () => {
 
     const handleSave = () => {
         if (results) {
-            localStorage.setItem('split_results', JSON.stringify(results));
-            localStorage.setItem('split_executedRows', JSON.stringify(executedRows));
-            localStorage.setItem('split_activeTab', activeTab);
+            // The custom hook already saves on state change, so we just need to give feedback.
             alert('계산 결과가 저장되었습니다.');
         } else {
             alert('저장할 계산 결과가 없습니다. 먼저 계산을 실행해주세요.');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coin-calculator-cache-v6';
+const CACHE_NAME = 'coin-calculator-cache-v7';
 const urlsToCache = [
   '/',
   '/index.html',

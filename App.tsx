@@ -149,6 +149,7 @@ const App: React.FC = () => {
   
   return (
     <div className="container">
+      <h1>레버리지 & 분할매수 계산기</h1>
       <div className="tabs-container">
         <button
           className={`tab-button ${activeTool === 'leverage' ? 'active' : ''}`}
