@@ -1,11 +1,11 @@
-const CACHE_NAME = 'coin-calculator-cache-v3';
+const CACHE_NAME = 'coin-calculator-cache-v5';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
-  'https://cdn.tailwindcss.com',
+  '/output.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'
 ];
 
