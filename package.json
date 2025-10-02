@@ -1,13 +1,1 @@
-{
-  "name": "coin-futures-simulator",
-  "version": "1.0.0",
-  "description": "코인 레버리지투자시 리스크에 따른 레버리지 결정 및 분할매수 계산",
-  "scripts": {
-    "build": "tailwindcss -i ./styles/input.css -o ./public/output.css && esbuild index.tsx --bundle --outfile=public/bundle.js --jsx=automatic && copyfiles index.html public"
-  },
-  "devDependencies": {
-    "copyfiles": "^2.4.1",
-    "tailwindcss": "^3.4.1",
-    "esbuild": "^0.23.0"
-  }
-}
+full contents of package.json
